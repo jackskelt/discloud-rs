@@ -2,7 +2,7 @@
 
 A wrapper for [Discloud's API](https://docs.discloudbot.com/api/usar-a-api) made in **Rust** 🦀.
 
-The crate have [tracing](https://crates.io/crates/tracing) for debug.
+The crate has [tracing](https://crates.io/crates/tracing) for debug.
 
 ## [Routes](https://discloud.github.io/apidoc/)
 
@@ -27,10 +27,11 @@ The crate have [tracing](https://crates.io/crates/tracing) for debug.
 
 ### Get user info
 ```rs
-extern crate discloud_rs;
+use discloud_rs::Discloud;
+
 #[tokio::main]
 async fn main() {
-    let client = discloud_rs::Discloud::new("TOKEN");
+    let client = Discloud::new("TOKEN");
 
     let user = client.get_user_info().await.unwrap();
 }
@@ -38,15 +39,13 @@ async fn main() {
 
 ### Set locale
 ```rs
-extern crate discloud_rs;
-
-use discloud_rs::Locale;
+use discloud_rs::{ Discloud, Locale };
 
 #[tokio::main]
 async fn main() {
-    let client = discloud_rs::Discloud::new("TOKEN");
+    let client = Discloud::new("TOKEN");
 
-    client.set_locale(Locale::PtBR).await.unwrap(); // Set language to Portuguese from Brazil
+    client.set_locale(Locale::PtBR).await.unwrap(); // Set language to Brazilian Portuguese
 }
 ```
 
