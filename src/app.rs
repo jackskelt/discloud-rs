@@ -96,6 +96,26 @@ pub struct AppLogsTerminal {
     pub url: String,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+pub struct AppBackupResponseUnique {
+    pub backups: AppBackup,
+    pub message: String,
+    pub status: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct AppBackupResponseAll {
+    pub backups: Vec<AppBackup>,
+    pub message: String,
+    pub status: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct AppBackup {
+    pub id: String,
+    pub url: String,
+}
+
 impl App {
     pub async fn get_status(&self, client: &Discloud) -> Result<AppStatus, Error> {
         client.get_app_status(&self.id).await
@@ -103,5 +123,9 @@ impl App {
 
     pub async fn get_logs(&self, client: &Discloud) -> Result<AppLogs, Error> {
         client.get_app_logs(&self.id).await
+    }
+
+    pub async fn get_backup(&self, client: &Discloud) -> Result<AppBackup, Error> {
+        client.get_app_backup(&self.id).await
     }
 }

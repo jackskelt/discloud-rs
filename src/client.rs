@@ -8,8 +8,9 @@ use serde::de::DeserializeOwned;
 
 use crate::{
     app::{
-        App, AppLogs, AppLogsResponseAll, AppLogsResponseUnique, AppResponseAll, AppResponseUnique,
-        AppStatus, AppStatusResponseAll, AppStatusResponseUnique,
+        App, AppBackup, AppBackupResponseAll, AppBackupResponseUnique, AppLogs, AppLogsResponseAll,
+        AppLogsResponseUnique, AppResponseAll, AppResponseUnique, AppStatus, AppStatusResponseAll,
+        AppStatusResponseUnique,
     },
     config::Config,
     user::{Locale, LocaleResponse, User, UserResponse},
@@ -105,5 +106,25 @@ impl Discloud {
             make_request(&self.config, Method::GET, "app/all/logs").await?;
 
         Ok(body.apps)
+    }
+
+    pub async fn get_app_backup(&self, id: &str) -> Result<AppBackup, Error> {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function. Use get_all_apps_backup method instead.",
+            ));
+        }
+
+        let body: AppBackupResponseUnique =
+            make_request(&self.config, Method::GET, &format!("app/{id}/backup")).await?;
+
+        Ok(body.backups)
+    }
+
+    pub async fn get_all_apps_backup(&self) -> Result<Vec<AppBackup>, Error> {
+        let body: AppBackupResponseAll =
+            make_request(&self.config, Method::GET, "app/all/backup").await?;
+
+        Ok(body.backups)
     }
 }
