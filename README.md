@@ -14,8 +14,8 @@ The crate has [tracing](https://crates.io/crates/tracing) for debug.
   - [x] Set locale
 - [ ] Upload
 - [ ] App
-  - [ ] Info
-  - [ ] Status
+  - [x] Info
+  - [x] Status
   - [ ] Logs
   - [ ] Backup
   - [ ] Manage (start, restart, stop, ram, commit, delete)
@@ -52,3 +52,34 @@ async fn main() {
 }
 ```
 
+### Get app
+```rs
+use discloud_rs::{ Discloud };
+
+#[tokio::main]
+async fn main() {
+    let client = Discloud::new("TOKEN");
+
+    client.get_all_apps().await.unwrap(); // Get all apps
+
+    client.get_app("APP_ID").await.unwrap(); // Get app by id
+}
+```
+
+### Get app status
+```rs
+use discloud_rs::{ Discloud };
+
+#[tokio::main]
+async fn main() {
+    let client = Discloud::new("TOKEN");
+
+    client.get_all_apps_status().await.unwrap(); // Get all apps status
+
+    client.get_app_status("APP_ID").await.unwrap(); // Get app status by id
+
+    // Get app status from app
+    let app = client.get_app("APP_ID").await.unwrap();
+    app.get_status(&client).await.unwrap();
+}
+```

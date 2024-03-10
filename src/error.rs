@@ -6,6 +6,7 @@ pub enum Error {
     InvalidToken,
     Ratelimited,
     ServerError,
+    InvalidRequest(&'static str),
     NotFound,
     Unknown,
 }
@@ -16,6 +17,7 @@ impl fmt::Display for Error {
             Error::Reqwest(ref e) => write!(f, "HTTP request error: {e}"),
             Error::InvalidToken => write!(f, "Invalid API token provided"),
             Error::Ratelimited => write!(f, "You have been ratelimited"),
+            Error::InvalidRequest(r) => write!(f, "Invalid request: {r}"),
             Error::ServerError => write!(f, "Server error"),
             Error::NotFound => write!(f, "Not found"),
             Error::Unknown => write!(f, "Unknown error"),
