@@ -16,7 +16,7 @@ The crate has [tracing](https://crates.io/crates/tracing) for debug.
 - [ ] App
   - [x] Info
   - [x] Status
-  - [ ] Logs
+  - [x] Logs
   - [ ] Backup
   - [ ] Manage (start, restart, stop, ram, commit, delete)
 - [ ] Team Manager
@@ -78,8 +78,26 @@ async fn main() {
 
     client.get_app_status("APP_ID").await.unwrap(); // Get app status by id
 
-    // Get app status from app
+    // Get status from app
     let app = client.get_app("APP_ID").await.unwrap();
     app.get_status(&client).await.unwrap();
+}
+```
+
+### Get app logs
+```rs
+use discloud_rs::{ Discloud };
+
+#[tokio::main]
+async fn main() {
+    let client = Discloud::new("TOKEN");
+
+    client.get_all_apps_logs().await.unwrap(); // Get all apps logs (Be careful if you have many apps)
+
+    client.get_app_logs("APP_ID").await.unwrap(); // Get app logs by id
+
+    // Get logs from app
+    let app = client.get_app("APP_ID").await.unwrap();
+    app.get_logs(&client).await.unwrap();
 }
 ```

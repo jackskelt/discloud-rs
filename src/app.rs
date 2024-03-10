@@ -69,8 +69,39 @@ pub struct NetIO {
     pub up: String,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+pub struct AppLogsResponseAll {
+    pub apps: Vec<AppLogs>,
+    pub message: String,
+    pub status: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct AppLogsResponseUnique {
+    pub apps: AppLogs,
+    pub message: String,
+    pub status: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct AppLogs {
+    pub id: String,
+    pub terminal: AppLogsTerminal,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct AppLogsTerminal {
+    pub big: Option<String>,
+    pub small: Option<String>,
+    pub url: String,
+}
+
 impl App {
     pub async fn get_status(&self, client: &Discloud) -> Result<AppStatus, Error> {
         client.get_app_status(&self.id).await
+    }
+
+    pub async fn get_logs(&self, client: &Discloud) -> Result<AppLogs, Error> {
+        client.get_app_logs(&self.id).await
     }
 }
