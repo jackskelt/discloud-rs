@@ -8,16 +8,17 @@ A wrapper for [Discloud's API](https://docs.discloudbot.com/api/usar-a-api) made
 The crate has [tracing](https://crates.io/crates/tracing) for debug.
 
 ## [Routes](https://discloud.github.io/apidoc/)
+*Click for usage example*
 
-- [x] User
-  - [x] Get user info
-  - [x] Set locale
+- [x] [User](#user)
+  - [x] [Get user info](#get-user-info)
+  - [x] [Set locale](#set-locale)
 - [ ] Upload
-- [ ] App
-  - [x] Info
-  - [x] Status
-  - [x] Logs
   - [ ] Backup
+- [ ] [App](#app)
+  - [x] [Info](#get-app)
+  - [x] [Status](#get-app-status)
+  - [x] [Logs](#get-app-logs)
   - [ ] Manage (start, restart, stop, ram, commit, delete)
 - [ ] Team Manager
 - [ ] Team
@@ -27,6 +28,8 @@ The crate has [tracing](https://crates.io/crates/tracing) for debug.
   - [ ] Status
 
 ## Usage
+
+## User
 
 ### Get user info
 ```rs
@@ -51,6 +54,8 @@ async fn main() {
     client.set_locale(Locale::PtBR).await.unwrap(); // Set language to Brazilian Portuguese
 }
 ```
+
+## App
 
 ### Get app
 ```rs
