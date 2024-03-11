@@ -5,6 +5,12 @@ mod error;
 mod user;
 mod util;
 
+pub use app::{
+    backup::AppBackup,
+    logs::{AppLogs, AppLogsTerminal},
+    status::{AppStatus, NetIO},
+    App,
+};
 pub use client::Discloud;
 pub use error::Error;
 pub use user::{Locale, User};

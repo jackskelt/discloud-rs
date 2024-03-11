@@ -8,9 +8,10 @@ use serde::de::DeserializeOwned;
 
 use crate::{
     app::{
-        App, AppBackup, AppBackupResponseAll, AppBackupResponseUnique, AppLogs, AppLogsResponseAll,
-        AppLogsResponseUnique, AppResponseAll, AppResponseUnique, AppStatus, AppStatusResponseAll,
-        AppStatusResponseUnique,
+        backup::*,
+        logs::*,
+        status::*,
+        App, AppResponseAll, AppResponseUnique,
     },
     config::Config,
     user::{Locale, LocaleResponse, User, UserResponse},
