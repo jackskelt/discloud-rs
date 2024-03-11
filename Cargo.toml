@@ -3,6 +3,7 @@ name = "discloud-rs"
 version = "0.1.0"
 authors = ["jackskelt"]
 description = "A rust wrapper for Discloud's API"
+repository = "https://github.com/jackskelt/discloud-rs"
 license = "Apache-2.0"
 keywords = ["discloud", "hosting", "api", "wrapper"]
 categories = ["api-bindings"]
