@@ -10,7 +10,7 @@ use crate::{Discloud, Error};
 use self::{
     backup::AppBackup,
     logs::AppLogs,
-    manage::{AppStartError, AppStartStatus, AppStopError, AppRamError},
+    manage::{AppRamError, AppStartError, AppStartStatus, AppStopError},
     status::AppStatus,
 };
 
@@ -58,5 +58,29 @@ impl App {
 
     pub async fn get_backup(&self, client: &Discloud) -> Result<AppBackup, Error> {
         client.get_app_backup(&self.id).await
+    }
+
+    pub async fn start(&self, client: &Discloud) -> Result<AppStartStatus, AppStartError> {
+        client.start_app(&self.id).await
+    }
+
+    pub async fn stop(&self, client: &Discloud) -> Result<(), AppStopError> {
+        client.stop_app(&self.id).await
+    }
+
+    pub async fn restart(&self, client: &Discloud) -> Result<(), Error> {
+        client.restart_app(&self.id).await
+    }
+
+    pub async fn set_ram(&self, client: &Discloud, quantity: u32) -> Result<(), AppRamError> {
+        client.set_app_ram(&self.id, quantity).await
+    }
+
+    pub async fn commit(&self) {
+        todo!()
+    }
+
+    pub async fn delete(&self, client: &Discloud) -> Result<(), Error> {
+        client.delete_app(&self.id).await
     }
 }

@@ -8,6 +8,10 @@ mod util;
 pub use app::{
     backup::AppBackup,
     logs::{AppLogs, AppLogsTerminal},
+    manage::{
+        AppDeleteAll, AppRamError, AppRestartAll, AppStartAll, AppStartError, AppStartStatus,
+        AppStopAll, AppStopError,
+    },
     status::{AppStatus, NetIO},
     App,
 };
