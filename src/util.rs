@@ -40,6 +40,7 @@ pub async fn make_request<T: DeserializeOwned + Debug>(
         }
 
         return Err(match response_status.as_u16() {
+            403 => Error::Forbidden,
             401 => Error::InvalidToken,
             429 => Error::Ratelimited,
             404 => Error::NotFound,
