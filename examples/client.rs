@@ -10,5 +10,5 @@ async fn main() {
 
     let user = client.get_user_info().await.unwrap();
 
-    println!("{user:?}");
+    println!("{user:#?}");
 }
