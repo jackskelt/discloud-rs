@@ -139,8 +139,7 @@ impl Discloud {
             return Err(AppStartError::AlreadyOnline);
         }
 
-        res.app_status
-            .ok_or(AppStartError::Other(Error::Unknown))
+        res.app_status.ok_or(AppStartError::Other(Error::Unknown))
     }
 
     pub async fn start_all_apps(&self) -> Result<AppStartAll, Error> {

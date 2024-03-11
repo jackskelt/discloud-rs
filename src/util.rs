@@ -53,7 +53,6 @@ pub async fn make_request<T: DeserializeOwned + Debug>(
     Ok(body)
 }
 
-
 pub async fn make_request_with_body<T: DeserializeOwned + Debug, B: Serialize>(
     config: &Config,
     method: Method,
