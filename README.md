@@ -32,7 +32,7 @@ The crate has [tracing](https://crates.io/crates/tracing) for debug.
 ## User
 
 ### Get user info
-```rs
+```rust,no_run
 use discloud_rs::Discloud;
 
 #[tokio::main]
@@ -44,7 +44,7 @@ async fn main() {
 ```
 
 ### Set locale
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud, Locale };
 
 #[tokio::main]
@@ -58,7 +58,7 @@ async fn main() {
 ## App
 
 ### Get app
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud };
 
 #[tokio::main]
@@ -72,7 +72,7 @@ async fn main() {
 ```
 
 ### Get app status
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud };
 
 #[tokio::main]
@@ -90,7 +90,7 @@ async fn main() {
 ```
 
 ### Get app logs
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud };
 
 #[tokio::main]
@@ -108,7 +108,7 @@ async fn main() {
 ```
 
 ### Get app backup
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud };
 
 #[tokio::main]
@@ -128,7 +128,7 @@ async fn main() {
 ## Manage App
 
 ### Start
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud, AppStartError };
 
 #[tokio::main]
@@ -164,7 +164,7 @@ async fn main() {
 ```
 
 ### Restart
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud };
 
 #[tokio::main]
@@ -182,7 +182,7 @@ async fn main() {
 ```
 
 ### Stop
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud, AppStopError };
 
 #[tokio::main]
@@ -218,7 +218,7 @@ async fn main() {
 ```
 
 ### Set RAM
-```rs
+```rust,no_run
 use discloud_rs::{ Discloud, AppRamError };
 
 #[tokio::main]
@@ -251,7 +251,7 @@ async fn main() {
 ```
 
 ### Delete
-```rs
+```rust,no_run
 use discloud_rs::Discloud;
 
 #[tokio::main]
