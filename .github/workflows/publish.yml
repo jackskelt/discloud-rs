@@ -1,0 +1,20 @@
+name: "[Release] Publish to crates.io"
+on:
+    release:
+        types: [published]
+
+jobs:
+    publish:
+        name: Publish
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Set up Rust Toolchain
+              uses: actions-rs/toolchain@v1
+              with:
+                  profile: minimal
+                  toolchain: stable
+                  override: true
+            - name: Publish to crates.io
+              run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
