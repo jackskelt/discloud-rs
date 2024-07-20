@@ -9,8 +9,12 @@ use serde::de::DeserializeOwned;
 use crate::{
     app::{backup::*, logs::*, manage::*, status::*, App, AppResponseAll, AppResponseUnique},
     config::Config,
+    team_manager::{
+        APITeamMember, AddTeamMemberResponse, GetTeamManagerResponse, TeamMember, TeamMemberBody,
+        TeamPerms,
+    },
     user::{Locale, LocaleResponse, User, UserResponse},
-    util::{make_request, make_request_with_body},
+    util::{make_request, make_request_with_body, DiscloudDefaultResponse},
 };
 
 use tracing::{debug, trace};
@@ -31,6 +35,73 @@ impl Discloud {
                 concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
             ),
         }
+    }
+
+    pub async fn remove_app_mod(&self, app_id: &str, mod_id: &str) -> Result<(), Error> {
+        let _res: DiscloudDefaultResponse = make_request(
+            &self.config,
+            Method::DELETE,
+            &format!("app/{app_id}/team/{mod_id}"),
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn edit_app_mod(
+        &self,
+        app_id: &str,
+        mod_id: &str,
+        perms: Vec<TeamPerms>,
+    ) -> Result<TeamMember, Error> {
+        let res: AddTeamMemberResponse = make_request_with_body(
+            &self.config,
+            Method::PUT,
+            &format!("app/{app_id}/team"),
+            TeamMemberBody {
+                mod_id: mod_id.to_string(),
+                perms,
+            },
+        )
+        .await?;
+        Ok(res.app)
+    }
+
+    pub async fn add_app_mod(
+        &self,
+        app_id: &str,
+        mod_id: &str,
+        perms: Vec<TeamPerms>,
+    ) -> Result<TeamMember, Error> {
+        let res: AddTeamMemberResponse = make_request_with_body(
+            &self.config,
+            Method::POST,
+            &format!("app/{app_id}/team"),
+            TeamMemberBody {
+                mod_id: mod_id.to_string(),
+                perms,
+            },
+        )
+        .await?;
+
+        Ok(res.app)
+    }
+
+    pub async fn get_app_team(&self, id: &str) -> Result<Vec<TeamMember>, Error> {
+        let res: GetTeamManagerResponse =
+            make_request(&self.config, Method::GET, &format!("app/{id}/team")).await?;
+
+        let team_members = res
+            .team
+            .iter()
+            .map(|v| TeamMember {
+                mod_id: v.id.clone(),
+                app_id: id.to_owned(),
+                perms: v.perms.clone(),
+            })
+            .collect::<Vec<_>>();
+
+        Ok(team_members)
     }
 
     pub async fn get_user_info(&self) -> Result<User, Error> {

@@ -5,7 +5,7 @@ pub mod logs;
 pub mod manage;
 pub mod status;
 
-use crate::{Discloud, Error};
+use crate::{Discloud, Error, TeamMember, TeamPerms};
 
 use self::{
     backup::AppBackup,
@@ -82,5 +82,31 @@ impl App {
 
     pub async fn delete(&self, client: &Discloud) -> Result<(), Error> {
         client.delete_app(&self.id).await
+    }
+
+    pub async fn get_team(&self, client: &Discloud) -> Result<Vec<TeamMember>, Error> {
+        client.get_app_team(&self.id).await
+    }
+
+    pub async fn add_mod(
+        &self,
+        client: &Discloud,
+        mod_id: &str,
+        perms: Vec<TeamPerms>,
+    ) -> Result<TeamMember, Error> {
+        client.add_app_mod(&self.id, mod_id, perms).await
+    }
+
+    pub async fn edit_mod(
+        &self,
+        client: &Discloud,
+        mod_id: &str,
+        perms: Vec<TeamPerms>,
+    ) -> Result<TeamMember, Error> {
+        client.edit_app_mod(&self.id, mod_id, perms).await
+    }
+
+    pub async fn remove_mod(&self, client: &Discloud, mod_id: &str) -> Result<(), Error> {
+        client.remove_app_mod(&self.id, mod_id).await
     }
 }

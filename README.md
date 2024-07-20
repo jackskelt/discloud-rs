@@ -2,12 +2,12 @@
 
 # discloud-rs
 
-
 A wrapper for [Discloud's API](https://docs.discloudbot.com/api/usar-a-api) made in **Rust** 🦀.
 
 The crate has [tracing](https://crates.io/crates/tracing) for debug.
 
 ## [Routes](https://discloud.github.io/apidoc/)
+
 *Click for usage example*
 
 - [x] [User](#user)
@@ -20,7 +20,7 @@ The crate has [tracing](https://crates.io/crates/tracing) for debug.
   - [x] [Logs](#get-app-logs)
   - [x] [Backup](#get-app-backup)
   - [ ] [Manage](#manage-app) ([start](#start), [restart](#restart), [stop](#stop), [ram](#set-ram), commit, [delete](#delete))
-- [ ] Team Manager
+- [x] [Team Manager](#team-manage)
 - [ ] Team
   - [ ] Manage (start, restart, stop, commit, status)
   - [ ] Backup
@@ -32,6 +32,7 @@ The crate has [tracing](https://crates.io/crates/tracing) for debug.
 ## User
 
 ### Get user info
+
 ```rust,no_run
 use discloud_rs::Discloud;
 
@@ -44,6 +45,7 @@ async fn main() {
 ```
 
 ### Set locale
+
 ```rust,no_run
 use discloud_rs::{ Discloud, Locale };
 
@@ -58,6 +60,7 @@ async fn main() {
 ## App
 
 ### Get app
+
 ```rust,no_run
 use discloud_rs::{ Discloud };
 
@@ -72,6 +75,7 @@ async fn main() {
 ```
 
 ### Get app status
+
 ```rust,no_run
 use discloud_rs::{ Discloud };
 
@@ -90,6 +94,7 @@ async fn main() {
 ```
 
 ### Get app logs
+
 ```rust,no_run
 use discloud_rs::{ Discloud };
 
@@ -108,6 +113,7 @@ async fn main() {
 ```
 
 ### Get app backup
+
 ```rust,no_run
 use discloud_rs::{ Discloud };
 
@@ -128,6 +134,7 @@ async fn main() {
 ## Manage App
 
 ### Start
+
 ```rust,no_run
 use discloud_rs::{ Discloud, AppStartError };
 
@@ -164,6 +171,7 @@ async fn main() {
 ```
 
 ### Restart
+
 ```rust,no_run
 use discloud_rs::{ Discloud };
 
@@ -182,6 +190,7 @@ async fn main() {
 ```
 
 ### Stop
+
 ```rust,no_run
 use discloud_rs::{ Discloud, AppStopError };
 
@@ -218,6 +227,7 @@ async fn main() {
 ```
 
 ### Set RAM
+
 ```rust,no_run
 use discloud_rs::{ Discloud, AppRamError };
 
@@ -251,6 +261,7 @@ async fn main() {
 ```
 
 ### Delete
+
 ```rust,no_run
 use discloud_rs::Discloud;
 
@@ -267,5 +278,92 @@ async fn main() {
     // Delete from app
     let app = client.get_app("APP_ID").await.unwrap();
     app.delete(&client).await.unwrap();
+}
+```
+
+## Team Manage
+
+### Get app team
+
+```rust,no_run
+use discloud_rs::Discloud;
+
+#[tokio::main]
+async fn main() {
+    let client = Discloud::new("TOKEN");
+
+    // Get app team using client
+    client.get_app_team("APP_ID").await.unwrap();
+
+    // Get app team using app
+    let app = client.get_app("APP_ID").await.unwrap();
+    app.get_team(&client).await.unwrap();
+}
+```
+
+### Add app mod
+
+```rust,no_run
+use discloud_rs::{Discloud, TeamPerms};
+
+#[tokio::main]
+async fn main() {
+    let client = Discloud::new("TOKEN");
+
+    // Add app mod using client
+    client.add_app_mod("APP_ID", "MOD_ID", vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+
+    // Add app mod using app
+    let app = client.get_app("APP_ID").await.unwrap();
+    app.add_mod(&client, "MOD_ID", vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+}
+```
+
+### Edit app mod
+
+```rust,no_run
+use discloud_rs::{Discloud, TeamPerms};
+
+#[tokio::main]
+async fn main() {
+    let client = Discloud::new("TOKEN");
+
+    // Edit mod permissions using client
+    client.edit_app_mod("APP_ID", "MOD_ID", vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+
+    // Edit mod permissions using app
+    let app = client.get_app("APP_ID").await.unwrap();
+    app.edit_mod(&client, "MOD_ID", vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+
+    // Edit mod permissions from mod
+    if let Some(mod) = app.get_team(&client).await.unwrap().first() {
+      mod.edit_perms(&client, vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+
+      // Or add permissions to mod
+      mod.add_perms(&client, vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+  };
+}
+```
+
+### Remove app mod
+
+```rust,no_run
+use discloud_rs::{Discloud, TeamPerms};
+
+#[tokio::main]
+async fn main() {
+    let client = Discloud::new("TOKEN");
+
+    // Remove mod using client
+    client.remove_app_mod("APP_ID", "MOD_ID").await.unwrap();
+
+    // Remove mod using app
+    let app = client.get_app("APP_ID").await.unwrap();
+    app.remove_mod(&client, "MOD_ID").await.unwrap();
+
+    // Remove from mod
+    if let Some(mod) = app.get_team(&client).await.unwrap().first() {
+      mod.remove(&client).await.unwrap();
+  };
 }
 ```
