@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use reqwest::{Client, Method};
 use serde::{de::DeserializeOwned, Serialize};
-use tracing::debug;
+use tracing::{debug, trace};
 
 use crate::{config::Config, Error};
 
@@ -53,7 +53,7 @@ pub async fn make_request<T: DeserializeOwned + Debug>(
     Ok(body)
 }
 
-pub async fn make_request_with_body<T: DeserializeOwned + Debug, B: Serialize>(
+pub async fn make_request_with_body<T: DeserializeOwned + Debug, B: Serialize + Debug>(
     config: &Config,
     method: Method,
     path: &str,
@@ -75,6 +75,7 @@ pub async fn make_request_with_body<T: DeserializeOwned + Debug, B: Serialize>(
     let response_status = response.status();
 
     if !response_status.is_success() {
+        trace!(?body);
         debug!(
             status = response_status.as_u16(),
             response_body = format!("{:?}", response.text().await),

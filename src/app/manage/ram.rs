@@ -8,7 +8,7 @@ pub struct AppRamResponse {
     pub status: String,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct AppRamBody {
     #[serde(rename = "ramMB")]
     pub ram: u32,
