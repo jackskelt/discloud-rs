@@ -1,3 +1,5 @@
+#![allow(warnings)]
+
 mod app;
 mod client;
 mod config;
