@@ -336,11 +336,11 @@ async fn main() {
     app.edit_mod(&client, "MOD_ID", vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
 
     // Edit mod permissions from mod
-    if let Some(mod) = app.get_team(&client).await.unwrap().first() {
-      mod.edit_perms(&client, vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+    if let Some(app_mod) = app.get_team(&client).await.unwrap().first() {
+      app_mod.edit_perms(&client, vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
 
       // Or add permissions to mod
-      mod.add_perms(&client, vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
+      app_mod.add_perms(&client, vec![TeamPerms::Start, TeamPerms::Stop]).await.unwrap();
   };
 }
 ```
@@ -362,8 +362,8 @@ async fn main() {
     app.remove_mod(&client, "MOD_ID").await.unwrap();
 
     // Remove from mod
-    if let Some(mod) = app.get_team(&client).await.unwrap().first() {
-      mod.remove(&client).await.unwrap();
+    if let Some(app_mod) = app.get_team(&client).await.unwrap().first() {
+      app_mod.remove(&client).await.unwrap();
   };
 }
 ```
