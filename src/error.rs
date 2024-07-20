@@ -8,7 +8,8 @@ pub enum Error {
     ServerError,
     Forbidden,
     InvalidRequest(&'static str),
-    NotFound,
+    NotFound(&'static str),
+    Conflict(&'static str),
     Unknown,
 }
 
@@ -21,7 +22,8 @@ impl fmt::Display for Error {
             Error::InvalidRequest(r) => write!(f, "Invalid request: {r}"),
             Error::ServerError => write!(f, "Server error"),
             Error::Forbidden => write!(f, "Forbidden access"),
-            Error::NotFound => write!(f, "Not found"),
+            Error::NotFound(r) => write!(f, "Not found: {r}"),
+            Error::Conflict(r) => write!(f, "Conflict: {r}"),
             Error::Unknown => write!(f, "Unknown error"),
         }
     }
