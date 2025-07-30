@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use std::fs;
 use reqwest::{
     header::{HeaderMap, HeaderName},
     Client, Method, Request, StatusCode,
@@ -18,7 +19,7 @@ use crate::{
 };
 
 use tracing::{debug, trace};
-
+use crate::util::make_request_with_file;
 use super::error::Error;
 
 #[derive(Clone)]
@@ -284,8 +285,27 @@ impl Discloud {
         Ok(())
     }
 
-    pub async fn commit_app(&self) {
-        todo!()
+    pub async fn commit_app(&self, id: &str, filepath: &str) -> Result<(), Error>  {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function.",
+            ));
+        }
+
+        let file = match fs::read(filepath) {
+            Ok(buf) => buf,
+            Err(err) => {
+                return Err(Error::ReadFile(err))
+            }
+        };
+
+        let res: AppCommitResponseUnique = make_request_with_file(&self.config, Method::PUT, &format!("app/{id}/commit"), file).await?;
+
+        if res.status == "error" {
+            return Err(Error::Unknown);
+        }
+
+        Ok(())
     }
 
     pub async fn delete_app(&self, id: &str) -> Result<(), Error> {
