@@ -1,6 +1,6 @@
 [package]
 name = "discloud-rs"
-version = "0.2.1-alpha"
+version = "0.3.0-alpha"
 authors = ["jackskelt"]
 description = "A rust wrapper for Discloud's API"
 repository = "https://github.com/jackskelt/discloud-rs"
