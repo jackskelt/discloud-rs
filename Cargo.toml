@@ -1,7 +1,7 @@
 [package]
 name = "discloud-rs"
 version = "0.2.1-alpha"
-authors = ["jackskelt", "Nathan Miguel"]
+authors = ["jackskelt"]
 description = "A rust wrapper for Discloud's API"
 repository = "https://github.com/jackskelt/discloud-rs"
 license = "Apache-2.0"
