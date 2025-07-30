@@ -35,7 +35,7 @@ pub struct App {
     pub auto_restart: bool,
     #[serde(rename = "avatarURL")]
     pub avatar_url: String,
-    pub exit_code: i32,
+    pub exit_code: Option<i32>,
     pub id: String,
     pub lang: String,
     pub main_file: String,
