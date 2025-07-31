@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 use std::fmt::Debug;
 
 use reqwest::{Client, Method};
@@ -123,7 +123,10 @@ pub async fn make_request_with_file<T: DeserializeOwned + Debug>(
     let url = default_url(path);
 
     debug!("Creating request client");
-    let client = Client::builder().user_agent(&config.user_agent).build()?;
+    let client = Client::builder()
+        .user_agent(&config.user_agent)
+        .read_timeout(Duration::from_secs(100))
+        .build()?;
 
     debug!(url = url, "Making request");
 
