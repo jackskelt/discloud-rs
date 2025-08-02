@@ -6,7 +6,6 @@ pub mod manage;
 pub mod status;
 
 use crate::{Discloud, Error, TeamMember, TeamPerms};
-
 use self::{
     backup::AppBackup,
     logs::AppLogs,
@@ -76,8 +75,8 @@ impl App {
         client.set_app_ram(&self.id, quantity).await
     }
 
-    pub async fn commit(&self) {
-        todo!()
+    pub async fn commit(&self, client: &Discloud, id: &str, filepath: &str) -> Result<(), Error> {
+        client.commit_app(&self.id, filepath).await
     }
 
     pub async fn delete(&self, client: &Discloud) -> Result<(), Error> {
