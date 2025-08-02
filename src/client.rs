@@ -364,7 +364,7 @@ impl Discloud {
         Ok(res.apps)
     }
 
-    pub async fn get_team_mods(&self, owner_id: &str) -> Result<Vec<TeamApp>, Error> {
+    pub async fn get_team_mods(&self, owner_id: &str) {
         todo!()
     }
 
