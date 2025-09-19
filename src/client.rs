@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use std::fs;
 use reqwest::{
     header::{HeaderMap, HeaderName},
     Client, Method, Request, StatusCode,
@@ -7,18 +8,14 @@ use reqwest::{
 use serde::de::DeserializeOwned;
 
 use crate::{
-    app::{backup::*, logs::*, manage::*, status::*, App, AppResponseAll, AppResponseUnique},
-    config::Config,
-    team_manager::{
+    app::{backup::*, logs::*, manage::*, status::*, App, AppResponseAll, AppResponseUnique}, config::Config, team::{TeamApp, TeamAppsResponseUnique}, team_manager::{
         APITeamMember, AddTeamMemberResponse, GetTeamManagerResponse, TeamMember, TeamMemberBody,
         TeamPerms,
-    },
-    user::{Locale, LocaleResponse, User, UserResponse},
-    util::{make_request, make_request_with_body, DiscloudDefaultResponse},
+    }, upload::{UploadApp, UploadOk}, user::{Locale, LocaleResponse, User, UserResponse}, util::{make_request, make_request_with_body, DiscloudDefaultResponse}
 };
 
 use tracing::{debug, trace};
-
+use crate::util::make_request_with_file;
 use super::error::Error;
 
 #[derive(Clone)]
@@ -284,8 +281,27 @@ impl Discloud {
         Ok(())
     }
 
-    pub async fn commit_app(&self) {
-        todo!()
+    pub async fn commit_app(&self, id: &str, filepath: &str) -> Result<(), Error>  {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function.",
+            ));
+        }
+
+        let file = match fs::read(filepath) {
+            Ok(buf) => buf,
+            Err(err) => {
+                return Err(Error::ReadFile(err))
+            }
+        };
+
+        let res: AppCommitResponseUnique = make_request_with_file(&self.config, Method::PUT, &format!("app/{id}/commit"), file).await?;
+
+        if res.status == "error" {
+            return Err(Error::Unknown);
+        }
+
+        Ok(())
     }
 
     pub async fn delete_app(&self, id: &str) -> Result<(), Error> {
@@ -312,6 +328,213 @@ impl Discloud {
         if res.status == "error" {
             return Err(Error::Unknown);
         }
+
+        Ok(res.apps)
+    }
+
+    // Upload
+
+    pub async fn upload_app(&self, filepath: &str) -> Result<UploadApp, Error> {
+        let file = match fs::read(filepath) {
+            Ok(buf) => buf,
+            Err(err) => {
+                return Err(Error::ReadFile(err))
+            }
+        };
+
+        let res: UploadOk = make_request_with_file(&self.config, Method::POST, &format!("upload"), file).await?;
+
+        if res.status == "error" {
+            return Err(Error::Unknown);
+        }
+
+        Ok(res.app)
+    }
+
+    // Team
+
+    pub async fn get_team_apps(&self) -> Result<Vec<TeamApp>, Error> {
+        let res: TeamAppsResponseUnique =
+            make_request(&self.config, Method::GET, &format!("team")).await?;
+
+        if res.status == "error" {
+            return Err(Error::Unknown);
+        }
+
+        Ok(res.apps)
+    }
+
+    pub async fn get_team_mods(&self, owner_id: &str) {
+        todo!()
+    }
+
+    pub async fn start_team_app(&self, id: &str) -> Result<AppStartStatus, AppStartError> {
+        if id == "all" {
+            return Err(AppStartError::Other(Error::InvalidRequest(
+                "Don't use all with that function. Use start_all_team_apps method instead.",
+            )));
+        }
+
+        let res: AppStartResponseUnique =
+            make_request(&self.config, Method::PUT, &format!("team/{id}/start")).await?;
+
+        if res.status == "error" {
+            return Err(AppStartError::AlreadyOnline);
+        }
+
+        res.app_status.ok_or(AppStartError::Other(Error::Unknown))
+    }
+
+    pub async fn start_all_team_apps(&self) -> Result<AppStartAll, Error> {
+        let res: AppStartResponseAll =
+            make_request(&self.config, Method::PUT, "team/all/start").await?;
+
+        Ok(res.apps)
+    }
+
+    pub async fn restart_team_app(&self, id: &str) -> Result<(), Error> {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function. Use restart_all_team_apps method instead.",
+            ));
+        }
+
+        let res: AppRestartResponseUnique =
+            make_request(&self.config, Method::PUT, &format!("team/{id}/restart")).await?;
+
+        if res.status == "error" {
+            return Err(Error::Unknown);
+        }
+
+        Ok(())
+    }
+
+    pub async fn restart_all_team_apps(&self) -> Result<AppRestartAll, Error> {
+        let res: AppRestartResponseAll =
+            make_request(&self.config, Method::PUT, "team/all/restart").await?;
+
+        Ok(res.apps)
+    }
+
+    pub async fn stop_team_app(&self, id: &str) -> Result<(), AppStopError> {
+        if id == "all" {
+            return Err(AppStopError::Other(Error::InvalidRequest(
+                "Don't use all with that function. Use stop_all_team_apps method instead.",
+            )));
+        }
+
+        let res: AppStartResponseUnique =
+            make_request(&self.config, Method::PUT, &format!("team/{id}/stop")).await?;
+
+        if res.status == "error" {
+            return Err(AppStopError::AlreadyOffline);
+        }
+
+        Ok(())
+    }
+
+    pub async fn stop_all_team_apps(&self) -> Result<AppStopAll, Error> {
+        let res: AppStopResponseAll =
+            make_request(&self.config, Method::PUT, "team/all/stop").await?;
+
+        Ok(res.apps)
+    }
+
+    pub async fn commit_team_app(&self, id: &str, filepath: &str) -> Result<(), Error>  {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function.",
+            ));
+        }
+
+        let file = match fs::read(filepath) {
+            Ok(buf) => buf,
+            Err(err) => {
+                return Err(Error::ReadFile(err))
+            }
+        };
+
+        let res: AppCommitResponseUnique = make_request_with_file(&self.config, Method::PUT, &format!("team/{id}/commit"), file).await?;
+
+        if res.status == "error" {
+            return Err(Error::Unknown);
+        }
+
+        Ok(())
+    }
+
+    pub async fn get_team_app_backup(&self, id: &str) -> Result<AppBackup, Error> {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function. Use get_all_team_apps_backup method instead.",
+            ));
+        }
+
+        let res: AppBackupResponseUnique =
+            make_request(&self.config, Method::GET, &format!("team/{id}/backup")).await?;
+
+        Ok(res.backups)
+    }
+
+    pub async fn get_team_all_apps_backup(&self) -> Result<Vec<AppBackup>, Error> {
+        let res: AppBackupResponseAll =
+            make_request(&self.config, Method::GET, "team/all/backup").await?;
+
+        Ok(res.backups)
+    }
+
+    pub async fn get_team_app_logs(&self, id: &str) -> Result<AppLogs, Error> {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function. Use get_all_team_apps_logs method instead.",
+            ));
+        }
+
+        let res: AppLogsResponseUnique =
+            make_request(&self.config, Method::GET, &format!("team/{id}/logs")).await?;
+
+        Ok(res.apps)
+    }
+
+    pub async fn get_all_team_apps_logs(&self) -> Result<Vec<AppLogs>, Error> {
+        let res: AppLogsResponseAll =
+            make_request(&self.config, Method::GET, "team/all/logs").await?;
+
+        Ok(res.apps)
+    }
+
+    pub async fn set_team_app_ram(&self, id: &str, quantity: u32) -> Result<(), AppRamError> {
+        let res: AppRamResponse = make_request_with_body(
+            &self.config,
+            Method::PUT,
+            &format!("team/{id}/ram"),
+            AppRamBody { ram: quantity },
+        )
+        .await?;
+
+        if res.status == "error" {
+            return Err(AppRamError::ForbiddenQuantity(res.message));
+        }
+
+        Ok(())
+    }
+
+    pub async fn get_all_team_apps_status(&self) -> Result<Vec<AppStatus>, Error> {
+        let res: AppStatusResponseAll =
+            make_request(&self.config, Method::GET, "team/all/status").await?;
+
+        Ok(res.apps)
+    }
+
+    pub async fn get_team_app_status(&self, id: &str) -> Result<AppStatus, Error> {
+        if id == "all" {
+            return Err(Error::InvalidRequest(
+                "Don't use all with that function. Use get_all_team_apps_status method instead.",
+            ));
+        }
+
+        let res: AppStatusResponseUnique =
+            make_request(&self.config, Method::GET, &format!("team/{id}/status")).await?;
 
         Ok(res.apps)
     }

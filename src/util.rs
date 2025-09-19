@@ -1,3 +1,4 @@
+use std::{collections::HashMap, time::Duration};
 use std::fmt::Debug;
 
 use reqwest::{Client, Method};
@@ -88,6 +89,65 @@ pub async fn make_request_with_body<T: DeserializeOwned + Debug, B: Serialize + 
     if !response_status.is_success() {
         let response_body = response.text().await?;
         trace!(?body);
+        debug!(
+            status = response_status.as_u16(),
+            response_body, "Request failed"
+        );
+        if response_status.is_server_error() {
+            return Err(Error::ServerError);
+        }
+        let response: DiscloudDefaultResponse =
+            serde_json::from_str(&response_body).unwrap_or_default();
+
+        return Err(match response_status.as_u16() {
+            401 => Error::InvalidToken,
+            403 => Error::Forbidden,
+            429 => Error::Ratelimited,
+            404 => Error::NotFound(response.message.leak()),
+            409 => Error::Conflict(response.message.leak()),
+            _ => Error::Unknown,
+        });
+    }
+
+    let body = response.json::<T>().await?;
+    debug!(response_body = format!("{body:?}"), "Request succeed");
+    Ok(body)
+}
+
+pub async fn make_request_with_file<T: DeserializeOwned + Debug>(
+    config: &Config,
+    method: Method,
+    path: &str,
+    file: Vec<u8>,
+) -> Result<T, Error> {
+    let url = default_url(path);
+
+    debug!("Creating request client");
+    let client = Client::builder()
+        .user_agent(&config.user_agent)
+        .read_timeout(Duration::from_secs(100))
+        .build()?;
+
+    debug!(url = url, "Making request");
+
+    let file_multipart = reqwest::multipart::Part::bytes(file)
+        .file_name("App.zip")
+        .mime_str("application/x-zip-compressed")?;
+
+    let form = reqwest::multipart::Form::new().part("file", file_multipart);
+
+    let response = client
+        .request(method, url)
+        .multipart(form)
+        .header("api-token", &config.token)
+        .header("Content-Type", "multipart/form-data")
+        .send()
+        .await?;
+
+    let response_status = response.status();
+
+    if !response_status.is_success() {
+        let response_body = response.text().await?;
         debug!(
             status = response_status.as_u16(),
             response_body, "Request failed"
